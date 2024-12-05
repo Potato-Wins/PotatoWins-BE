@@ -15,19 +15,19 @@ import java.time.LocalDateTime;
 public class SensorData {
 
     @Id
-    private Long id;
+    private Integer id;
 
     private Integer applicationID;
     private String applicationName;
-    private String devEUI;
+    private Long devEUI;
     private String deviceName;
-    private Double temp;
+    private Double Temp;
     private Double pH;
-    private Double turbidity;
-    private Double doValue; // `DO` 대신 `doValue`로 변경
-    private Double nh4;
+    private Double TURBIDITY;
+    private Double DO;
+    private Double NH4;
     private Double salt;
-    private Double alcohol;
+    private Double ALCOHOL;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

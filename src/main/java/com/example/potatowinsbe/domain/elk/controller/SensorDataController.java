@@ -10,8 +10,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @RestController
 public class SensorDataController {
+
+    private static final Logger logger = LoggerFactory.getLogger(SensorDataController.class);
 
     private final SensorDataService sensorDataService;
 
@@ -19,14 +24,18 @@ public class SensorDataController {
         this.sensorDataService = sensorDataService;
     }
 
-
     @GetMapping("/sensor-data")
     public List<SensorData> getAllSensorData() {
-        return sensorDataService.getAllSensorData();
+        List<SensorData> allData = sensorDataService.getAllSensorData();
+        logger.info("Returned {} records to the client", allData.size());
+        return allData;
     }
 
     @GetMapping("/sensor-data/search")
     public List<SensorData> findByApplicationName(@RequestParam String applicationName) {
-        return sensorDataService.findByApplicationName(applicationName);
+        List<SensorData> data = sensorDataService.findByApplicationName(applicationName);
+        logger.info("Returned {} records for applicationName '{}'", data.size(), applicationName);
+        return data;
     }
 }
+
