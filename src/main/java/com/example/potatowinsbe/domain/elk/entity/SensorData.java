@@ -21,9 +21,9 @@ public class SensorData {
     private String applicationName;
     private Long devEUI;
     private String deviceName;
-    private Double Temp;
+    private Double temp;
     private Double pH;
-    private Double TURBIDITY;
+    private Double turbidity;
     private Double DO;
     private Double NH4;
     private Double salt;

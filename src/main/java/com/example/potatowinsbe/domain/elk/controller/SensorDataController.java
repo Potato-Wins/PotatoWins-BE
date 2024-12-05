@@ -1,17 +1,15 @@
 package com.example.potatowinsbe.domain.elk.controller;
 
 import com.example.potatowinsbe.domain.elk.entity.SensorData;
+import com.example.potatowinsbe.domain.elk.service.SensorAlgorithmService;
 import com.example.potatowinsbe.domain.elk.service.SensorDataService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @RestController
 public class SensorDataController {
@@ -19,9 +17,12 @@ public class SensorDataController {
     private static final Logger logger = LoggerFactory.getLogger(SensorDataController.class);
 
     private final SensorDataService sensorDataService;
+    private final SensorAlgorithmService sensorAlgorithmService;
 
-    public SensorDataController(SensorDataService sensorDataService) {
+    // 두 개의 서비스 주입
+    public SensorDataController(SensorDataService sensorDataService, SensorAlgorithmService sensorAlgorithmService) {
         this.sensorDataService = sensorDataService;
+        this.sensorAlgorithmService = sensorAlgorithmService;
     }
 
     @GetMapping("/sensor-data")
@@ -37,5 +38,9 @@ public class SensorDataController {
         logger.info("Returned {} records for applicationName '{}'", data.size(), applicationName);
         return data;
     }
-}
 
+    @GetMapping("/sensor-data/abnormal")
+    public String getAbnormalTemperature() {
+        return sensorAlgorithmService.monitorAndAdjustTemperature();
+    }
+}
