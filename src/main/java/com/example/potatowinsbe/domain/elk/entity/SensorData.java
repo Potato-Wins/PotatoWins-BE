@@ -1,5 +1,6 @@
 package com.example.potatowinsbe.domain.elk.entity;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
@@ -9,6 +10,7 @@ import java.time.LocalDateTime;
 
 @Setter
 @Getter
+@Data
 @Document(indexName = "sensor_data")
 public class SensorData {
 

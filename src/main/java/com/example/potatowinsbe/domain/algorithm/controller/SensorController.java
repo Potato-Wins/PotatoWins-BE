@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @RestController
 public class SensorController {
@@ -23,7 +25,8 @@ public class SensorController {
      */
     @GetMapping("/sensors")
     public List<SensorData> getAllSensorData() {
-        return sensorDataRepository.findAll();
+        return StreamSupport.stream(sensorDataRepository.findAll().spliterator(), false)
+                .collect(Collectors.toList());
     }
 
     /**
