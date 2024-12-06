@@ -41,10 +41,10 @@ public class SensorDataController {
     }
 
     @GetMapping("/sensor-data/abnormal")
-    public Map<String, Object> getAbnormalTemperature() {
-        List<Map<String, Object>> data = sensorAlgorithmService.monitorAndAdjustTemperature();
+    public Map<String, Object> getAbnormalMetrics() {
+        List<Map<String, Object>> data = sensorAlgorithmService.monitorAndAdjustMetrics(); // 올바른 메서드 이름 사용
         Map<String, Object> response = new HashMap<>();
-        response.put("message", "장치별 최신 온도 데이터 및 이상 온도 처리 결과");
+        response.put("message", "장치별 최신 데이터 및 이상 항목 처리 결과");
         response.put("data", data);
         return response;
     }

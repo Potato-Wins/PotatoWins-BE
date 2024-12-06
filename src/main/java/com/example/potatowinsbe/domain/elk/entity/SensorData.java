@@ -32,5 +32,6 @@ public class SensorData {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+
     // Getters and Setters
 }
