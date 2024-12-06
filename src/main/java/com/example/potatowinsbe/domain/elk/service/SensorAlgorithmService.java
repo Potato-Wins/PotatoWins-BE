@@ -45,7 +45,7 @@ public class SensorAlgorithmService {
                     if (temperature == null) {
                         deviceInfo.put("temp", "온도 데이터가 없습니다.");
                     } else {
-                        deviceInfo.put("temp", analyzeMetric("온도", temperature, MIN_TEMP, MAX_TEMP));
+                        deviceInfo.put("temp", analyzeAndAdjustMetric("온도", temperature, MIN_TEMP, MAX_TEMP, 1000.0, 15.0));
                     }
 
                     // 염분 처리
@@ -53,7 +53,7 @@ public class SensorAlgorithmService {
                     if (salt == null) {
                         deviceInfo.put("salt", "염분 데이터가 없습니다.");
                     } else {
-                        deviceInfo.put("salt", analyzeMetric("염분", salt, MIN_SALT, MAX_SALT));
+                        deviceInfo.put("salt", analyzeAndAdjustMetric("염분", salt, MIN_SALT, MAX_SALT, 1000.0, 0.0));
                     }
 
                     // pH 처리
@@ -71,18 +71,60 @@ public class SensorAlgorithmService {
 
     /**
      * 특정 지표에 대해 분석하고 결과 메시지를 반환합니다.
+     * 필요한 물의 양을 포함하여 계산합니다.
      */
-    private String analyzeMetric(String metricName, double value, double min, double max) {
+    private Map<String, Object> analyzeAndAdjustMetric(String metricName, double value, double min, double max, double currentWaterVolume, double addedWaterValue) {
+        Map<String, Object> result = new HashMap<>();
+        result.put("value", value);
+
         if (value < min) {
             double adjustment = min - value;
-            return String.format("%s: %.2f (적정 수준까지 %.2f 증가 필요)", metricName, value, adjustment);
+            double requiredWater = calculateRequiredWater(currentWaterVolume, value, addedWaterValue, min);
+            result.put("message", String.format("%s: %.2f (적정 수준까지 %.2f 증가 필요)", metricName, value, adjustment));
+            result.put("requiredWater", requiredWater);
         } else if (value > max) {
             double adjustment = value - max;
-            return String.format("%s: %.2f (적정 수준까지 %.2f 감소 필요)", metricName, value, adjustment);
+            double requiredWater = calculateRequiredWater(currentWaterVolume, value, addedWaterValue, max);
+            result.put("message", String.format("%s: %.2f (적정 수준까지 %.2f 감소 필요)", metricName, value, adjustment));
+            result.put("requiredWater", requiredWater);
         } else {
-            return String.format("%s: %.2f (적정 수준)", metricName, value);
+            result.put("message", String.format("%s: %.2f (적정 수준)", metricName, value));
         }
+
+        return result;
     }
+
+    /**
+     * 필요한 물의 양 계산
+     */
+    private double calculateRequiredWater(double currentVolume, double currentValue, double addedValue, double targetValue) {
+        return Math.abs((targetValue * currentVolume - currentValue * currentVolume) / (addedValue - targetValue));
+    }
+    /**
+     * 특정 지표에 대해 분석하고 결과 메시지를 반환합니다.
+     */
+    private Map<String, Object> analyzeMetric(String metricName, double value, double min, double max) {
+        Map<String, Object> result = new HashMap<>();
+        if (value < min) {
+            double adjustment = min - value;
+            result.put("value", value);
+            result.put("message", String.format("%s: %.2f (적정 수준까지 %.2f 증가 필요)", metricName, value, adjustment));
+            result.put("action", "increase");
+            result.put("adjustment", adjustment);
+        } else if (value > max) {
+            double adjustment = value - max;
+            result.put("value", value);
+            result.put("message", String.format("%s: %.2f (적정 수준까지 %.2f 감소 필요)", metricName, value, adjustment));
+            result.put("action", "decrease");
+            result.put("adjustment", adjustment);
+        } else {
+            result.put("value", value);
+            result.put("message", String.format("%s: %.2f (적정 수준)", metricName, value));
+            result.put("action", "none");
+        }
+        return result;
+    }
+
 
     /**
      * 각 장치별 최신 데이터를 조회
