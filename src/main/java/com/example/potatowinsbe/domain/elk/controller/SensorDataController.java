@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class SensorDataController {
@@ -19,7 +21,6 @@ public class SensorDataController {
     private final SensorDataService sensorDataService;
     private final SensorAlgorithmService sensorAlgorithmService;
 
-    // 두 개의 서비스 주입
     public SensorDataController(SensorDataService sensorDataService, SensorAlgorithmService sensorAlgorithmService) {
         this.sensorDataService = sensorDataService;
         this.sensorAlgorithmService = sensorAlgorithmService;
@@ -40,7 +41,11 @@ public class SensorDataController {
     }
 
     @GetMapping("/sensor-data/abnormal")
-    public String getAbnormalTemperature() {
-        return sensorAlgorithmService.monitorAndAdjustTemperature();
+    public Map<String, Object> getAbnormalTemperature() {
+        List<Map<String, Object>> data = sensorAlgorithmService.monitorAndAdjustTemperature();
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "장치별 최신 온도 데이터 및 이상 온도 처리 결과");
+        response.put("data", data);
+        return response;
     }
 }
