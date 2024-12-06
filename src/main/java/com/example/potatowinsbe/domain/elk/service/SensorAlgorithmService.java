@@ -61,8 +61,18 @@ public class SensorAlgorithmService {
                     if (pH == null) {
                         deviceInfo.put("pH", "pH 데이터가 없습니다.");
                     } else {
-                        deviceInfo.put("pH", analyzeMetric("pH", pH, MIN_PH, MAX_PH));
+                        Map<String, Object> pHAnalysis = analyzeMetric("pH", pH, MIN_PH, MAX_PH);
+                        deviceInfo.put("pH", pHAnalysis);
+
+                        // CO₂ 조정 필요 시 계산
+                        if (!"none".equals(pHAnalysis.get("action"))) {
+                            double targetPH = pH < MIN_PH ? MIN_PH : MAX_PH;
+                            double waterVolume = 1000.0; // 물의 부피 (리터)
+                            Map<String, Object> co2Adjustment = adjustCO2ForPH(pH, targetPH, waterVolume);
+                            deviceInfo.put("pHAdjustment", co2Adjustment);
+                        }
                     }
+
 
                     return deviceInfo;
                 })
@@ -123,6 +133,36 @@ public class SensorAlgorithmService {
             result.put("action", "none");
         }
         return result;
+    }
+
+    /**
+     * pH 조정을 위해 필요한 CO₂ 양을 계산합니다.
+     */
+    private Map<String, Object> adjustCO2ForPH(double currentPH, double targetPH, double waterVolumeLiters) {
+        final double CO2_EFFECT_CONSTANT = 0.1; // pH 변화량 당 CO₂ 효과 상수 (예제 값)
+        Map<String, Object> adjustmentDetails = new HashMap<>();
+
+        double phDifference = targetPH - currentPH;
+
+        if (phDifference > 0) {
+            // pH를 증가시켜야 함 -> CO₂ 배출
+            double co2ToRelease = Math.abs(phDifference / CO2_EFFECT_CONSTANT) * waterVolumeLiters;
+            adjustmentDetails.put("action", "release");
+            adjustmentDetails.put("amount", co2ToRelease);
+            adjustmentDetails.put("message", String.format("pH를 %.2f로 증가시키기 위해 %.2fg의 CO₂ 배출이 필요합니다.", targetPH, co2ToRelease));
+        } else if (phDifference < 0) {
+            // pH를 감소시켜야 함 -> CO₂ 주입
+            double co2ToInject = Math.abs(phDifference / CO2_EFFECT_CONSTANT) * waterVolumeLiters;
+            adjustmentDetails.put("action", "inject");
+            adjustmentDetails.put("amount", co2ToInject);
+            adjustmentDetails.put("message", String.format("pH를 %.2f로 감소시키기 위해 %.2fg의 CO₂ 주입이 필요합니다.", targetPH, co2ToInject));
+        } else {
+            // pH가 적정 수준
+            adjustmentDetails.put("action", "none");
+            adjustmentDetails.put("message", String.format("현재 pH는 %.2f로 적정 수준입니다.", currentPH));
+        }
+
+        return adjustmentDetails;
     }
 
 
