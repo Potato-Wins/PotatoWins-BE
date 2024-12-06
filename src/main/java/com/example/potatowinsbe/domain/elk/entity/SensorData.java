@@ -1,5 +1,6 @@
 package com.example.potatowinsbe.domain.elk.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 @Setter
 @Getter
 @Data
-@Document(indexName = "sensor_data")
+@Document(indexName = "potato_v2")
 public class SensorData {
 
     @Id

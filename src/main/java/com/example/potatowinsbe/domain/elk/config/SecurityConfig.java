@@ -14,6 +14,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // 새로운 방식으로 CSRF 비활성화
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll() // 모든 요청을 허용
+                        //.requestMatchers("/sensor-data"),permitAll();
                 );
         return http.build();
     }

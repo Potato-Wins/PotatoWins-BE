@@ -1,33 +1,43 @@
 //package com.example.potatowinsbe.domain.elk.config;
-//import co.elastic.clients.elasticsearch.ElasticsearchClient;
-//import co.elastic.clients.transport.rest_client.RestClientTransport;
-//import org.apache.http.HttpHost;
-//import org.elasticsearch.client.RestClient;
-//import org.elasticsearch.client.RestHighLevelClient;
-//import org.springframework.context.annotation.Bean;
+//
 //import org.springframework.context.annotation.Configuration;
+//import org.springframework.data.elasticsearch.config.AbstractElasticsearchConfiguration;
+//import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+//import org.springframework.data.elasticsearch.core.convert.ElasticsearchCustomConversions;
+//import org.springframework.data.elasticsearch.core.convert.MappingElasticsearchConverter;
+//import org.springframework.data.elasticsearch.core.mapping.SimpleElasticsearchMappingContext;
+//import java.time.format.DateTimeFormatter;
+//import java.time.LocalDateTime;
 //
 //@Configuration
-//public class ElasticsearchConfig {
+//public class ElasticsearchConfig extends AbstractElasticsearchConfiguration {
 //
-//    @Bean
-//    public ElasticsearchClient elasticsearchClient() {
-//        RestClient restClient = RestClient.builder(
-//                new HttpHost("localhost", 9200, "http")
-//        ).build();
-//
-//        RestClientTransport transport = new RestClientTransport(
-//                restClient,
-//                new co.elastic.clients.json.jackson.JacksonJsonpMapper()
-//        );
-//
-//        return new ElasticsearchClient(transport);
+//    @Override
+//    public ElasticsearchRestTemplate elasticsearchRestTemplate() {
+//        return new ElasticsearchRestTemplate(elasticsearchClient());
 //    }
 //
-//    @Bean
-//    public RestHighLevelClient restHighLevelClient() {
-//        return new RestHighLevelClient(
-//                RestClient.builder(new HttpHost("localhost", 9200, "http"))
+//    @Override
+//    public ElasticsearchCustomConversions elasticsearchCustomConversions() {
+//        return new ElasticsearchCustomConversions(
+//                Arrays.asList(
+//                        new LocalDateTimeToStringConverter(),
+//                        new StringToLocalDateTimeConverter()
+//                )
 //        );
+//    }
+//
+//    private static class LocalDateTimeToStringConverter implements org.springframework.core.convert.converter.Converter<LocalDateTime, String> {
+//        @Override
+//        public String convert(LocalDateTime source) {
+//            return source.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+//        }
+//    }
+//
+//    private static class StringToLocalDateTimeConverter implements org.springframework.core.convert.converter.Converter<String, LocalDateTime> {
+//        @Override
+//        public LocalDateTime convert(String source) {
+//            return LocalDateTime.parse(source, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+//        }
 //    }
 //}
