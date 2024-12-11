@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Setter
 @Getter
 @Data
-@Document(indexName = "potato_v2")
+@Document(indexName = "sensor")
 public class SensorData {
 
     @Id
